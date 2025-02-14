@@ -1,0 +1,9 @@
+{
+  "name": "on-chain-riddle",
+  "dependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.15.9",
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "chai": "^4.5.0",
+    "viem": "^2.23.2"
+  }
+}
