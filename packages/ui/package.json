@@ -7,7 +7,9 @@
     "./connect-button": "./src/connect-button.tsx",
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
+    "./code": "./src/code.tsx",
+    "./provider": "./src/provider.tsx",
+    "./color-mode": "./src/color-mode.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -28,6 +30,7 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0"
   }
 }

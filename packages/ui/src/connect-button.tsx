@@ -2,6 +2,17 @@
 
 import * as React from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { Box, Button, ButtonProps } from "@chakra-ui/react";
+
+import { MenuRoot, MenuTrigger, MenuContent, MenuItem } from "./menu";
+
+export const LoadingConnectButton = () => {
+  return (
+    <Button loading={true}>
+      Loading...
+    </Button>
+  );
+};
 
 export interface ConnectButtonProps {
   className?: string;
@@ -10,15 +21,17 @@ export interface ConnectButtonProps {
 }
 
 export function ConnectButton({
-  className = "",
   onConnect,
   onDisconnect,
-}: ConnectButtonProps) {
+  ...props
+}: ConnectButtonProps & ButtonProps) {
   const { address, isConnected } = useAccount();
+  const [loading, setLoading] = React.useState(false);
   const { connect, connectors } = useConnect({
     mutation: {
       onSuccess() {
         onConnect?.();
+        setLoading(false);
       },
     },
   });
@@ -26,31 +39,53 @@ export function ConnectButton({
     mutation: {
       onSuccess() {
         onDisconnect?.();
+        setLoading(false);
       },
     },
   });
 
+  const handleClick = (fn: () => void) => {
+    setLoading(true);
+    fn();
+  };
+
   if (isConnected) {
     return (
-      <button onClick={() => disconnect()} className={className}>
-        {address
-          ? `${address.slice(0, 6)}...${address.slice(-4)}`
-          : "Connected"}
-      </button>
+      <MenuRoot positioning={{ placement: "bottom-end" }}>
+        <MenuTrigger asChild>
+          <Button loading={loading} {...props}>
+            {address
+              ? `${address.slice(0, 6)}...${address.slice(-4)}`
+              : "Connect"}
+          </Button>
+        </MenuTrigger>
+        <MenuContent>
+          <MenuItem value="Disconnect" onClick={() => handleClick(disconnect)}>
+            Disconnect
+          </MenuItem>
+        </MenuContent>
+      </MenuRoot>
     );
   }
 
   return (
-    <>
-      {connectors.map((connector) => (
-        <button
-          key={connector.uid}
-          onClick={() => connect({ connector })}
-          className={className}
-        >
-          Connect {connector.name}
-        </button>
-      ))}
-    </>
+    <MenuRoot positioning={{ placement: "bottom-end" }}>
+      <MenuTrigger asChild>
+        <Button loading={loading} {...props}>
+          Connect
+        </Button>
+      </MenuTrigger>
+      <MenuContent>
+        {connectors.map((connector) => (
+          <MenuItem
+            key={connector.uid}
+            value={connector.name}
+            onClick={() => handleClick(() => connect({ connector }))}
+          >
+            <Box flex="1">{connector.name}</Box>
+          </MenuItem>
+        ))}
+      </MenuContent>
+    </MenuRoot>
   );
 }

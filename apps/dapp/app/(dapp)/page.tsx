@@ -1,12 +1,10 @@
-import styles from "./page.module.css";
-import { ConnectButton } from "@repo/ui/connect-button";
+import { Container } from "@chakra-ui/react";
+import Header from "../../content/header";
 
-export default function Home() {
+export default function Page() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <ConnectButton />
-      </main>
-    </div>
+    <Container>
+      <Header />
+    </Container>
   );
 }
