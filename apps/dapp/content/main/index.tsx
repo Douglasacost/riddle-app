@@ -16,7 +16,7 @@ export default function Main() {
   const { isConnected, address } = useAccount();
   const [isBot, setIsBot] = useState(false);
 
-  const { isLoading, error, checkBot } = useIsRiddleBot({
+  const { isLoading, checkBot } = useIsRiddleBot({
     address: riddleContractAddress,
   });
 
@@ -28,7 +28,11 @@ export default function Main() {
   }, [isConnected, address, checkBot, isLoading]);
 
   if (isLoading) {
-    return <LoadingAnswerRiddle />;
+    return (
+      <VStack flex={1} align="center" justify="center" p={4}>
+        <LoadingAnswerRiddle />
+      </VStack>
+    );
   }
 
   if (isBot) {
