@@ -4,13 +4,11 @@ import hre from "hardhat";
 import { keccak256, toBytes, getAddress } from "viem";
 
 describe("OnChainRiddle", function () {
-  // Fixture para reutilizar la configuración
   async function deployRiddleFixture() {
     const [bot, otherAccount] = await hre.viem.getWalletClients();
 
     const riddle = await hre.viem.deployContract("OnchainRiddle", []);
 
-    // Ejemplo de acertijo y respuesta
     const testRiddle = "What has keys, but no locks?";
     const testAnswer = "piano";
     const answerHash = keccak256(toBytes(testAnswer));
