@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract OnchainRiddle {
+contract OnChainRiddle {
     address public bot;
     string public riddle;
     bytes32 private answerHash;

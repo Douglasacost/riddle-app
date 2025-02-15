@@ -7,7 +7,7 @@ describe("OnChainRiddle", function () {
   async function deployRiddleFixture() {
     const [bot, otherAccount] = await hre.viem.getWalletClients();
 
-    const riddle = await hre.viem.deployContract("OnchainRiddle", []);
+    const riddle = await hre.viem.deployContract("OnChainRiddle", []);
 
     const testRiddle = "What has keys, but no locks?";
     const testAnswer = "piano";
@@ -59,7 +59,7 @@ describe("OnChainRiddle", function () {
         await loadFixture(deployRiddleFixture);
 
       const riddleAsOther = await hre.viem.getContractAt(
-        "OnchainRiddle",
+        "OnChainRiddle",
         riddle.address,
         { client: { wallet: otherAccount } }
       );

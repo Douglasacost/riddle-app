@@ -1,24 +1,50 @@
 "use client";
 
 import { Text, VStack } from "@chakra-ui/react";
-import { LoadingConnectButton } from "@repo/ui/connect-button";
-import dynamic from "next/dynamic";
+import { CurrentRiddle } from "@repo/ui/current-riddle";
+import { AnswerRiddle, LoadingAnswerRiddle } from "@repo/ui/answer-riddle";
+import { SetRiddle } from "@repo/ui/set-riddle";
+import { Address } from "viem";
+import { useAccount } from "wagmi";
+import { useIsRiddleBot } from "@repo/hooks";
+import { useEffect, useState } from "react";
 
-const ConnectButton = dynamic(
-  () => import("@repo/ui/connect-button").then((mod) => mod.ConnectButton),
-  {
-    ssr: false,
-    loading: () => <LoadingConnectButton />,
+const riddleContractAddress = process.env
+  .NEXT_PUBLIC_RIDDLE_CONTRACT_ADDRESS as Address;
+
+export default function Main() {
+  const { isConnected, address } = useAccount();
+  const [isBot, setIsBot] = useState(false);
+
+  const { isLoading, error, checkBot } = useIsRiddleBot({
+    address: riddleContractAddress,
+  });
+
+  useEffect(() => {
+    if (!isLoading && isConnected && address) {
+      const isBot = checkBot(address);
+      setIsBot(isBot);
+    }
+  }, [isConnected, address, checkBot, isLoading]);
+
+  if (isLoading) {
+    return <LoadingAnswerRiddle />;
   }
-);
 
-export default function Header() {
+  if (isBot) {
+    return (
+      <VStack flex={1} align="center" justify="center" p={4}>
+        <SetRiddle address={riddleContractAddress} />
+      </VStack>
+    );
+  }
+
   return (
-    <VStack justify="space-between" align="center" p={4}>
-      <Text fontSize="2xl" fontWeight="bold">
-        Riddle Dapp
-      </Text>
-      <ConnectButton />
+    <VStack flex={1} align="center" justify="center" p={4}>
+      <CurrentRiddle address={riddleContractAddress} />
+
+      {isConnected && <AnswerRiddle address={riddleContractAddress} />}
+      {!isConnected && <Text>Connect to answer the riddle</Text>}
     </VStack>
   );
 }

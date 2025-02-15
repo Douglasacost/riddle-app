@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useEnsName } from "wagmi";
 import { Box, Button, ButtonProps } from "@chakra-ui/react";
 
 import { MenuRoot, MenuTrigger, MenuContent, MenuItem } from "./menu";
+import { getEnsName } from "viem/actions";
 
 export const LoadingConnectButton = () => {
   return (
@@ -26,6 +27,17 @@ export function ConnectButton({
   ...props
 }: ConnectButtonProps & ButtonProps) {
   const { address, isConnected } = useAccount();
+  const { data: ensName } = useEnsName({
+    address,
+  });
+
+  const buttonText = React.useMemo(() => {
+    if (ensName) {
+      return ensName;
+    }
+    return address?.slice(0, 6) + "..." + address?.slice(-4);
+  }, [ensName, address]);
+
   const [loading, setLoading] = React.useState(false);
   const { connect, connectors } = useConnect({
     mutation: {
@@ -54,9 +66,7 @@ export function ConnectButton({
       <MenuRoot positioning={{ placement: "bottom-end" }}>
         <MenuTrigger asChild>
           <Button loading={loading} {...props}>
-            {address
-              ? `${address.slice(0, 6)}...${address.slice(-4)}`
-              : "Connect"}
+            {buttonText ? buttonText : "Connect"}
           </Button>
         </MenuTrigger>
         <MenuContent>

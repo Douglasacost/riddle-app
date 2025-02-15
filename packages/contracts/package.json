@@ -1,9 +1,22 @@
 {
-  "name": "on-chain-riddle",
+  "name": "@repo/contracts",
+  "version": "0.0.0",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat ignition deploy ignition/modules/OnChainRiddle.ts --network sepolia",
+    "verify": "npx hardhat verify --network sepolia"
+  },
   "dependencies": {
     "@nomicfoundation/hardhat-ignition": "^0.15.9",
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
     "chai": "^4.5.0",
     "viem": "^2.23.2"
+  },
+  "exports": {
+    "./abi": "./artifacts/contracts/OnChainRiddle.sol/OnChainRiddle.json",
+    "./types": "./artifacts/contracts/OnChainRiddle.sol/OnChainRiddle.d.ts"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-etherscan": "^3.1.8"
   }
 }
