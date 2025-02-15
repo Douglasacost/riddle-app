@@ -5,7 +5,6 @@ import { useAccount, useConnect, useDisconnect, useEnsName } from "wagmi";
 import { Box, Button, ButtonProps } from "@chakra-ui/react";
 
 import { MenuRoot, MenuTrigger, MenuContent, MenuItem } from "./menu";
-import { getEnsName } from "viem/actions";
 
 export const LoadingConnectButton = () => {
   return (
