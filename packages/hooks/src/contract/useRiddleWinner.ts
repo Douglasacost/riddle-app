@@ -45,6 +45,5 @@ export function useRiddleWinner({ address }: UseRiddleWinnerConfig) {
     hasWinner,
     isLoading,
     error,
-    lookupWinner,
   };
 }
