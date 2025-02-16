@@ -7,7 +7,7 @@ import {
   Badge,
   Text,
 } from "@chakra-ui/react";
-import { useRiddle, useRiddleWinner } from "@repo/hooks";
+import { useAnswerRiddle, useRiddleWinner } from "@repo/hooks";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { Address } from "viem";
@@ -41,6 +41,7 @@ export const LoadingAnswerRiddle = () => {
             Submit
           </Button>
         </HStack>
+        <HStack mt={4} height="24px"></HStack>
       </Box>
     </>
   );
@@ -48,6 +49,7 @@ export const LoadingAnswerRiddle = () => {
 
 export function AnswerRiddle({ address }: { address: Address }) {
   const [answer, setAnswer] = useState("");
+  const [runConfetti, setRunConfetti] = useState(false);
   const { address: accountAddress, isConnected, isConnecting } = useAccount();
   const isError = answer.length > MAX_ANSWER_LENGTH;
 
@@ -59,11 +61,11 @@ export function AnswerRiddle({ address }: { address: Address }) {
     isConfirmed,
     transactionDetails,
     asserted,
-  } = useRiddle({
+  } = useAnswerRiddle({
     address,
   });
 
-  const { winner, hasWinner, lookupWinner, isLoading } = useRiddleWinner({
+  const { winner, hasWinner, isLoading } = useRiddleWinner({
     address,
   });
 
@@ -74,7 +76,6 @@ export function AnswerRiddle({ address }: { address: Address }) {
         type: "info",
         duration: 3000,
       });
-      lookupWinner();
     }
 
     if (transactionDetails?.error) {
@@ -92,7 +93,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
         duration: 3000,
       });
     }
-  }, [isConfirmed, transactionDetails, lookupWinner]);
+  }, [isConfirmed, transactionDetails]);
 
   useEffect(() => {
     if (submitError) {
@@ -126,8 +127,16 @@ export function AnswerRiddle({ address }: { address: Address }) {
     }
   };
 
+  const handleOnEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
   useEffect(() => {
     if (asserted === true) {
+      setAnswer("");
       toaster.create({
         title: "Correct answer",
         type: "success",
@@ -140,6 +149,13 @@ export function AnswerRiddle({ address }: { address: Address }) {
       });
     }
   }, [asserted]);
+
+  useEffect(() => {
+    const amITheWinner = hasWinner ? winner === accountAddress : asserted;
+    if (amITheWinner) {
+      setRunConfetti(true);
+    }
+  }, [winner, asserted, accountAddress, hasWinner]);
 
   const formatAddress = (address: Address) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
@@ -159,7 +175,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
       w={{ base: "100%", md: "90%", lg: "80%" }}
       onSubmit={handleSubmit}
     >
-      {(winner === accountAddress || asserted) && (
+      {runConfetti && (
         <Confetti
           width={window.innerWidth}
           height={window.innerHeight}
@@ -167,6 +183,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
           tweenDuration={6000}
           gravity={0.05}
           recycle={false}
+          onConfettiComplete={() => setRunConfetti(false)}
         />
       )}
       <HStack
@@ -194,6 +211,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
             _focus={{
               border: "none",
             }}
+            onKeyDown={handleOnEnter}
             outline="none"
             overflow="hidden"
             rows={2}
@@ -222,19 +240,13 @@ export function AnswerRiddle({ address }: { address: Address }) {
           fontWeight="bold"
           textAlign="center"
         >
-          {winner === accountAddress
+          {winner === accountAddress || asserted
             ? "You won this riddle!"
             : `This riddle is over. The winner is ${formatAddress(winner!)}.`}
         </Text>
       )}
-      <HStack
-        hidden={attempts.length === 0}
-        mt={4}
-        gap={4}
-        align="center"
-        justify="center"
-      >
-        <Text>Previous attempts: </Text>
+      <HStack mt={4} gap={4} align="center" justify="center" height="24px">
+        <Text hidden={attempts.length === 0}>Previous attempts: </Text>
         {attempts.map((attempt, index) => (
           <Badge key={index}>{formatAddress(attempt.user!)}</Badge>
         ))}

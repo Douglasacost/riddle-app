@@ -16,8 +16,21 @@ export function CurrentRiddle({ address }: { address: Address }) {
   }
 
   return (
-    <Skeleton loading={isRiddlePending} w="80%" minH="20px" mb={8}>
-      <Text fontSize="4xl" textAlign="center" fontWeight="bold">
+    <Skeleton
+      loading={isRiddlePending}
+      w="80%"
+      justifyContent="center"
+      display="flex"
+      h="100px"
+      mb={8}
+    >
+      <Text
+        key={riddle}
+        alignSelf="flex-end"
+        fontSize="4xl"
+        textAlign="center"
+        fontWeight="bold"
+      >
         {(riddle as string) || "No active riddle"}
       </Text>
     </Skeleton>
