@@ -59,7 +59,6 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
   });
 
   const {
-    isLoading: isConfirming,
     isSuccess: isConfirmed,
     ...transactionDetails
   } = useWaitForTransactionReceipt({
@@ -91,7 +90,6 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     error: riddleError,
 
     // Write states
-    isSubmitting: isSubmitPending,
     isSuccess: isConfirmed,
     submitError,
     transactionDetails,

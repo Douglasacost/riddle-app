@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useReadContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
   useWatchContractEvent,
 } from "wagmi";
 import { BaseContractConfig } from "./types";
 import OnChainRiddle from "@repo/contracts/abi";
 import { OnChainRiddle$Type } from "@repo/contracts/types";
-import { Address } from "viem";
+import { Address, zeroAddress } from "viem";
 
 const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
 export interface UseRiddleWinnerConfig extends BaseContractConfig {}
@@ -16,10 +14,7 @@ export interface UseRiddleWinnerConfig extends BaseContractConfig {}
 export function useRiddleWinner({ address }: UseRiddleWinnerConfig) {
   const [winner, setWinner] = useState<Address | null>(null);
 
-  const {
-    data: hasAnswered,
-    refetch: lookupWinner,
-  } = useReadContract({
+  const { data: hasAnswered, refetch: lookupWinner } = useReadContract({
     address,
     abi: RIDDLE_ABI,
     functionName: "winner",
@@ -32,13 +27,16 @@ export function useRiddleWinner({ address }: UseRiddleWinnerConfig) {
     pollingInterval: 2000,
     onLogs: (logs) => {
       logs.forEach((log) => {
-        log.args.user && setWinner(log.args.user);
+        const user = log.args.user;
+        if (user && user !== zeroAddress) {
+          setWinner(user);
+        }
       });
     },
   });
 
   useEffect(() => {
-    if (hasAnswered) {
+    if (hasAnswered && hasAnswered !== zeroAddress) {
       setWinner(hasAnswered);
     }
   }, [hasAnswered]);

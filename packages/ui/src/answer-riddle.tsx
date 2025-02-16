@@ -58,12 +58,11 @@ export function AnswerRiddle({ address }: { address: Address }) {
 
   const {
     submit: submitAnswer,
-    isSubmitting,
+    isSubmitPending,
     isSuccess,
     submitError,
     isSubmitSuccess,
     transactionDetails,
-    isSubmitPending,
     attempts,
   } = useRiddleContract({
     address,
@@ -102,7 +101,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
   }, [isSuccess, transactionDetails]);
 
   useEffect(() => {
-    if (isSubmitting) {
+    if (isSubmitPending) {
       toaster.create({
         id: answerToastId,
         title: "Submitting answer...",
@@ -133,7 +132,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
         duration: 3000,
       });
     }
-  }, [isSubmitSuccess, submitError, isSubmitPending, isSubmitting]);
+  }, [isSubmitSuccess, submitError, isSubmitPending]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,12 +151,16 @@ export function AnswerRiddle({ address }: { address: Address }) {
       w={{ base: "100%", md: "90%", lg: "80%" }}
       onSubmit={handleSubmit}
     >
-      {winner === accountAddress && <Confetti
-        width={window.innerWidth}
-        height={window.innerHeight}
-        numberOfPieces={80}
-        recycle={false}
-      />}
+      {winner === accountAddress && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          numberOfPieces={90}
+          tweenDuration={6000}
+          gravity={0.05}
+          recycle={false}
+        />
+      )}
       <HStack
         hidden={!!winner}
         width="100%"
@@ -171,7 +174,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
           boxShadow: "0px 0px 19px 0px rgba(255,255,255,1)",
         }}
       >
-        <Fieldset.Root invalid={isError} disabled={isSubmitting}>
+        <Fieldset.Root invalid={isError} disabled={isSubmitPending}>
           <Textarea
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
@@ -199,7 +202,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
           borderRadius="lg"
           boxShadow="inset 0px 0px 19px 0px rgba(0,0,0,0.30);"
           colorScheme="blue"
-          loading={isSubmitting}
+          loading={isSubmitPending}
           disabled={isError || !answer.trim()}
         >
           Submit
