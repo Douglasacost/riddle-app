@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { createWalletClient, http, keccak256, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { eip712WalletActions, zksyncSepoliaTestnet } from "viem/zksync";
@@ -8,6 +7,7 @@ import OnChainRiddle from "@repo/contracts/abi";
 const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddleAbi;
 
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
+const WEBHOOK_ID = process.env.WEBHOOK_ID;
 const RIDDLE_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_RIDDLE_CONTRACT_ADDRESS;
 
 const riddles = [
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
     console.log("Body:", body);
 
-    if (!body.webhookId || body.webhookId !== "wh_hak0sy08vdy1wbl") {
+    if (!body.webhookId || body.webhookId !== WEBHOOK_ID) {
       return new Response("Missing event field in request body", {
         status: 400,
       });
