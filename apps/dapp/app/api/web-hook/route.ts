@@ -41,14 +41,17 @@ const setRiddle = async () => {
     console.log("Setting riddle:", randomRiddle);
 
     const { client } = getWallet();
-    const hashedAnswer = keccak256(toBytes(randomRiddle.answer));
-    await client.writeContract({
+    const hashedAnswer = keccak256(toBytes(randomRiddle.answer.toLowerCase()));
+    const tx = await client.writeContract({
       address: RIDDLE_CONTRACT_ADDRESS as `0x${string}`,
       abi: RIDDLE_ABI,
       functionName: "setRiddle",
       args: [randomRiddle.riddle, hashedAnswer],
     });
+
+    console.log("Transaction:", tx);
     console.log("Riddle set:", randomRiddle);
+
     return true;
   } catch (error) {
     console.error("Error submitting answer:", error);
