@@ -81,7 +81,7 @@ export async function POST(req: Request) {
 
     console.log("Body:", body);
 
-    if (!body.webhookId || body.webhookId !== WEBHOOK_ID) {
+    if (body.length === 0) {
       return new Response("Missing event field in request body", {
         status: 400,
       });
