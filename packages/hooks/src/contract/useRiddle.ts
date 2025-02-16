@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   useReadContract,
   useWriteContract,
@@ -6,21 +6,15 @@ import {
   useWatchContractEvent,
 } from "wagmi";
 import { BaseContractConfig } from "./types";
+import { Address } from "viem";
 import OnChainRiddle from "@repo/contracts/abi";
 import { OnChainRiddle$Type } from "@repo/contracts/types";
-import { Address } from "viem";
 
 const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
-export interface UseRiddleContractConfig extends BaseContractConfig {}
 
-export function useRiddleContract({ address }: UseRiddleContractConfig) {
-  const [attempts, setAttempts] = useState<
-    {
-      user?: `0x${string}` | undefined;
-      correct?: boolean | undefined;
-    }[]
-  >([]);
+export interface UseRiddleConfig extends BaseContractConfig {}
 
+export function useRiddle({ address }: UseRiddleConfig) {
   const {
     data: riddle,
     error: riddleError,
@@ -32,15 +26,28 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     functionName: "riddle",
   });
 
+  const [attempts, setAttempts] = useState<
+    Array<{
+      user: Address;
+      correct: boolean;
+    }>
+  >([]);
+
+  const isActive = useMemo(() => {
+    return riddle !== undefined && riddle.length > 0;
+  }, [riddle]);
+
   useWatchContractEvent({
     address,
     abi: RIDDLE_ABI,
     eventName: "AnswerAttempt",
     pollingInterval: 2000,
     onLogs: (logs) => {
-      const newAttempts = logs.map((log) => log.args);
-      console.log("newAttempts", newAttempts);
-      setAttempts((prev) => [...prev, ...newAttempts]);
+      const newAttempts = logs.map((log) => ({
+        user: log.args.user as Address,
+        correct: log.args.correct as boolean,
+      }));
+      setAttempts((prev) => [...newAttempts, ...prev].slice(0, 10)); // Keep last 10 attempts
     },
   });
 
@@ -48,15 +55,12 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     data: hash,
     error: submitError,
     writeContract: submitAnswer,
+    isPending: isSubmitting,
     reset: resetSubmit,
   } = useWriteContract({
     mutation: {
       onError(error) {
         console.error("Error submitting answer:", error);
-        resetSubmit();
-      },
-      onSuccess() {
-        console.info("Success submitting answer");
         resetSubmit();
       },
     },
@@ -68,19 +72,20 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     ...transactionDetails
   } = useWaitForTransactionReceipt({
     hash,
-    confirmations: 0,
+    confirmations: 1,
     timeout: 10000,
-    pollingInterval: 1000,
   });
 
   const submit = useCallback(
     async (answer: string) => {
+      if (!answer.trim() || !address) return false;
+
       try {
         await submitAnswer({
           address,
           abi: RIDDLE_ABI,
           functionName: "submitAnswer",
-          args: [answer],
+          args: [answer.toLowerCase().trim()],
         });
         return true;
       } catch (error) {
@@ -96,15 +101,20 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     riddle,
     isRiddlePending,
     riddleError,
+    isActive,
 
     // Write states
     isConfirmed,
     isConfirming,
+    isSubmitting,
     submitError,
     transactionDetails,
+
+    // Attempt tracking
     attempts,
 
     // Actions
     submit,
+    refetchRiddle,
   };
 }

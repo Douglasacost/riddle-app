@@ -1,9 +1,9 @@
 import { Box, Text, Skeleton } from "@chakra-ui/react";
-import { useRiddleContract } from "@repo/hooks";
+import { useRiddle } from "@repo/hooks";
 import { Address } from "viem";
 
 export function CurrentRiddle({ address }: { address: Address }) {
-  const { isRiddlePending, riddleError, riddle } = useRiddleContract({
+  const { isRiddlePending, riddleError, riddle } = useRiddle({
     address,
   });
 

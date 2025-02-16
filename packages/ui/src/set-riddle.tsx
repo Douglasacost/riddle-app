@@ -6,7 +6,7 @@ import {
   Textarea,
   VStack,
 } from "@chakra-ui/react";
-import { useRiddleContractAsBot } from "@repo/hooks";
+import { useRiddleAsBot } from "@repo/hooks";
 import { Address } from "viem";
 import { toaster } from "./toaster";
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ export function SetRiddle({ address }: { address: Address }) {
     isConfirmed,
     isConfirming,
     transactionDetails,
-  } = useRiddleContractAsBot({
+  } = useRiddleAsBot({
     address,
   });
 

@@ -8,7 +8,7 @@ import {
   Text,
   Skeleton,
 } from "@chakra-ui/react";
-import { useRiddleContract, useRiddleWinner } from "@repo/hooks";
+import { useRiddle, useRiddleWinner } from "@repo/hooks";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { Address } from "viem";
@@ -63,7 +63,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
     isConfirming,
     isConfirmed,
     transactionDetails,
-  } = useRiddleContract({
+  } = useRiddle({
     address,
   });
 

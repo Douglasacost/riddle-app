@@ -6,11 +6,11 @@ import { OnChainRiddle$Type } from "@repo/contracts/types";
 import { Address, keccak256, toBytes } from "viem";
 
 const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
-export interface UseRiddleContractAsBotConfig extends BaseContractConfig {}
+export interface UseRiddleAsBotConfig extends BaseContractConfig {}
 
-export function useRiddleContractAsBot({
+export function useRiddleAsBot({
   address,
-}: UseRiddleContractAsBotConfig) {
+}: UseRiddleAsBotConfig) {
   const {
     data: hash,
     error: submitError,
