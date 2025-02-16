@@ -3,7 +3,6 @@ import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
-  useContractRead,
   useWatchContractEvent,
 } from "wagmi";
 import { BaseContractConfig } from "./types";
@@ -21,7 +20,6 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
       correct?: boolean | undefined;
     }[]
   >([]);
-  const [winner, setWinner] = useState<Address | null>(null);
 
   const {
     data: riddle,
@@ -34,24 +32,13 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     functionName: "riddle",
   });
 
-  const {
-    data: hasAnswered,
-    error: hasAnsweredError,
-    isPending: isHasAnsweredPending,
-    refetch: refetchHasAnswered,
-  } = useReadContract({
-    address,
-    abi: RIDDLE_ABI,
-    functionName: "winner",
-  });
-
   useWatchContractEvent({
     address,
     abi: RIDDLE_ABI,
     eventName: "AnswerAttempt",
     pollingInterval: 2000,
     onLogs: (logs) => {
-        const newAttempts = logs.map((log) => log.args);
+      const newAttempts = logs.map((log) => log.args);
       console.log("newAttempts", newAttempts);
       setAttempts((prev) => [...prev, ...newAttempts]);
     },
@@ -65,19 +52,19 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     writeContract: submitAnswer,
   } = useWriteContract({
     mutation: {
-      onSuccess() {
-        refetchHasAnswered();
-      },
       onError(error) {
         console.error("Error submitting answer:", error);
       },
     },
   });
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed, ...transactionDetails } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    ...transactionDetails
+  } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   const submit = useCallback(
     async (answer: string) => {
@@ -97,17 +84,11 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
     [address, submitAnswer]
   );
 
-  const refresh = useCallback(() => {
-    refetchRiddle();
-    refetchHasAnswered();
-  }, [refetchRiddle, refetchHasAnswered]);
-
   return {
     // Read states
     riddle,
-    hasAnswered,
-    isLoading: isRiddlePending || isHasAnsweredPending,
-    error: riddleError || hasAnsweredError,
+    isLoading: isRiddlePending,
+    error: riddleError,
 
     // Write states
     isSubmitting: isSubmitPending,
@@ -120,6 +101,5 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
 
     // Actions
     submit,
-    refresh,
   };
 }

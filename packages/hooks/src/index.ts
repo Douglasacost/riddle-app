@@ -1,4 +1,5 @@
 export * from "./contract/types";
-export * from "./contract/useRiddleContract";
-export * from "./contract/useRiddleContractAsBot";
+export * from "./contract/useRiddle";
+export * from "./contract/useRiddleAsBot";
 export * from "./contract/useIsRiddleBot";
+export * from "./contract/useRiddleWinner";

@@ -8,33 +8,52 @@ import {
   Text,
   Skeleton,
 } from "@chakra-ui/react";
-import { useRiddleContract } from "@repo/hooks";
+import { useRiddleContract, useRiddleWinner } from "@repo/hooks";
 import { useEffect, useState } from "react";
+import Confetti from "react-confetti";
 import { Address } from "viem";
 import { toaster } from "./toaster";
+import { useAccount } from "wagmi";
 
 const MAX_ANSWER_LENGTH = 100;
 const answerToastId = "answer-riddle-toast";
 
 export const LoadingAnswerRiddle = () => {
   return (
-    <Box w={{ base: "100%", md: "90%", lg: "80%" }}>
-      <HStack gap={4} align="flex-start">
-        <Fieldset.Root>
-          <Skeleton height="40px" width="400px" />
-        </Fieldset.Root>
+    <>
+      <Skeleton height="54px" width="400px" mb={8} />
+      <Box w={{ base: "100%", md: "90%", lg: "80%" }}>
+        <HStack
+          gap={4}
+          align="flex-start"
+          width="100%"
+          borderRadius="lg"
+          boxShadow="0px 0px 19px 0px rgba(255,255,255,0.30)"
+        >
+          <Box borderRadius="lg" w="100%" flex={1} />
 
-        <Button type="submit" colorScheme="blue" loading={true}></Button>
-      </HStack>
-      <HStack mt={4} gap={4} align="center" justify="center">
-        <Skeleton height="40px" width="400px" />
-      </HStack>
-    </Box>
+          <Button
+            type="submit"
+            h="60px"
+            borderRadius="lg"
+            boxShadow="inset 0px 0px 19px 0px rgba(0,0,0,0.30);"
+            colorScheme="blue"
+            loading={true}
+          >
+            Submit
+          </Button>
+        </HStack>
+        <HStack mt={4} gap={4} align="center" justify="center">
+          <Skeleton height="22px" width="400px" />
+        </HStack>
+      </Box>
+    </>
   );
 };
 
 export function AnswerRiddle({ address }: { address: Address }) {
   const [answer, setAnswer] = useState("");
+  const { address: accountAddress } = useAccount();
   const isError = answer.length > MAX_ANSWER_LENGTH;
 
   const {
@@ -50,6 +69,10 @@ export function AnswerRiddle({ address }: { address: Address }) {
     address,
   });
 
+  const { winner } = useRiddleWinner({
+    address,
+  });
+
   useEffect(() => {
     if (isSuccess) {
       toaster.update(answerToastId, {
@@ -57,6 +80,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
         type: "success",
         duration: 3000,
       });
+      setAnswer("");
     }
 
     if (transactionDetails?.error) {
@@ -95,7 +119,6 @@ export function AnswerRiddle({ address }: { address: Address }) {
     }
 
     if (submitError) {
-      console.log("submitError", submitError);
       const message =
         "shortMessage" in submitError
           ? submitError.shortMessage
@@ -109,7 +132,6 @@ export function AnswerRiddle({ address }: { address: Address }) {
         type: "error",
         duration: 3000,
       });
-      setAnswer("");
     }
   }, [isSubmitSuccess, submitError, isSubmitPending, isSubmitting]);
 
@@ -130,14 +152,21 @@ export function AnswerRiddle({ address }: { address: Address }) {
       w={{ base: "100%", md: "90%", lg: "80%" }}
       onSubmit={handleSubmit}
     >
+      {winner === accountAddress && <Confetti
+        width={window.innerWidth}
+        height={window.innerHeight}
+        numberOfPieces={80}
+        recycle={false}
+      />}
       <HStack
+        hidden={!!winner}
         width="100%"
         gap={4}
         align="flex-start"
+        borderRadius="lg"
         boxShadow="0px 0px 19px 0px rgba(255,255,255,0.30)"
         transition="all 0.3s ease"
         overflow="hidden"
-        borderRadius="lg"
         _focusWithin={{
           boxShadow: "0px 0px 19px 0px rgba(255,255,255,1)",
         }}
@@ -176,6 +205,17 @@ export function AnswerRiddle({ address }: { address: Address }) {
           Submit
         </Button>
       </HStack>
+      {winner && (
+        <Text
+          fontSize={{ base: "16px", md: "18px", lg: "20px" }}
+          fontWeight="bold"
+          textAlign="center"
+        >
+          {winner === accountAddress
+            ? "You won this riddle!"
+            : `This riddle is over. The winner is ${formatAddress(winner)}.`}
+        </Text>
+      )}
       <HStack mt={4} gap={4} align="center" justify="center">
         <Text>Previous attempts: </Text>
         {attempts.map((attempt, index) => (

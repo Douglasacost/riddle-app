@@ -29,9 +29,10 @@
     "wagmi": "^2.14.11"
   },
   "dependencies": {
+    "@repo/hooks": "*",
     "react": "^19.0.0",
+    "react-confetti": "^6.2.2",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.4.0",
-    "@repo/hooks": "*"
+    "react-icons": "^5.4.0"
   }
 }
