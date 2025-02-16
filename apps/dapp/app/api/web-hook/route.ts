@@ -41,12 +41,18 @@ const setRiddle = async () => {
     console.log("Setting riddle:", randomRiddle);
 
     const { client } = getWallet();
+    console.log("Client:", client.account.address);
+
+    console.log("Hashing answer:", randomRiddle.answer.toLowerCase());
     const hashedAnswer = keccak256(toBytes(randomRiddle.answer.toLowerCase()));
+
+    console.log("Writing contract:", RIDDLE_CONTRACT_ADDRESS);
     const tx = await client.writeContract({
       address: RIDDLE_CONTRACT_ADDRESS as `0x${string}`,
       abi: RIDDLE_ABI,
       functionName: "setRiddle",
       args: [randomRiddle.riddle, hashedAnswer],
+      type: "eip712",
     });
 
     console.log("Transaction:", tx);
@@ -87,7 +93,7 @@ export async function POST(req: Request) {
       });
     }
 
-    setRiddle();
+    await setRiddle();
 
     return new Response("ok", { status: 200 });
   } catch (error) {
