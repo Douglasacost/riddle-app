@@ -1,10 +1,14 @@
 import { useCallback, useState } from "react";
 import { zksyncSepoliaTestnet } from "viem/chains";
-import { useWalletClient } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { eip712WalletActions } from "viem/zksync";
-
+import { publicClient } from "@repo/config";
 export function useCustomContractWrite() {
-  const walletClient = useWalletClient();
+  const account = useAccount();
+  const walletClient = useWalletClient({
+    account: account.address,
+  });
+
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<Error>();
   const [hash, setHash] = useState<`0x${string}`>();
@@ -28,23 +32,33 @@ export function useCustomContractWrite() {
         setHash(undefined);
         setError(undefined);
 
-        const client = await walletClient.data?.extend(eip712WalletActions());
+        const client = walletClient.data?.extend(eip712WalletActions());
+        const account = client?.account;
+        const nonce = await publicClient.getTransactionCount({
+          address: account?.address as `0x${string}`,
+        });
+
         const tx = await client?.writeContract({
+          nonce,
           address,
           abi,
           functionName,
           args: args,
           type: "eip712",
+          chainId,
         } as any);
 
         if (!tx) {
-          debugger
           throw new Error("Failed to write to contract");
         }
 
-        setHash(tx);
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: tx,
+        });
 
-        return tx;
+        setHash(receipt.transactionHash);
+
+        return receipt;
       } catch (err) {
         setError(
           err instanceof Error ? err : new Error("Failed to write to contract")
@@ -54,7 +68,7 @@ export function useCustomContractWrite() {
         setIsPending(false);
       }
     },
-    [walletClient.data]
+    [walletClient]
   );
 
   return {

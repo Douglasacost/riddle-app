@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@repo/contracts": "*",
+        "@repo/config": "*",
         "@wagmi/core": "^2.16.4"
     },
     "devDependencies": {

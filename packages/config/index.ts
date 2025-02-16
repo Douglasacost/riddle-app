@@ -1,6 +1,12 @@
 import { metaMask, walletConnect, injected } from "wagmi/connectors";
 import { http, createConfig } from "wagmi";
-import { zksyncSepoliaTestnet } from "viem/zksync";
+import { eip712WalletActions, zksyncSepoliaTestnet } from "viem/zksync";
+import { createPublicClient } from "viem";
+
+export const publicClient = createPublicClient({
+  chain: zksyncSepoliaTestnet,
+  transport: http(),
+}).extend(eip712WalletActions());
 
 export const config = createConfig({
   chains: [zksyncSepoliaTestnet],
