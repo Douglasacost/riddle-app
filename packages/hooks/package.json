@@ -11,7 +11,8 @@
         "check-types": "tsc --noEmit"
     },
     "dependencies": {
-        "@repo/contracts": "*"
+        "@repo/contracts": "*",
+        "@wagmi/core": "^2.16.4"
     },
     "devDependencies": {
         "@repo/eslint-config": "*",

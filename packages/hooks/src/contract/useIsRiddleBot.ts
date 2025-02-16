@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useReadContract } from "wagmi";
 import { BaseContractConfig } from "./types";
-import { Abi, Address, zeroAddress } from "viem";
+import { Address, zeroAddress } from "viem";
 import OnChainRiddle from "@repo/contracts/abi";
+import { OnChainRiddle$Type } from "./OnChainRiddle";
 
-const RIDDLE_ABI = OnChainRiddle.abi as Abi;
+const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
 
 export interface UseIsRiddleBotConfig extends BaseContractConfig {}
 

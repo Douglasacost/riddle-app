@@ -67,7 +67,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
     address,
   });
 
-  const { winner, lookupWinner } = useRiddleWinner({
+  const { winner, hasWinner, lookupWinner } = useRiddleWinner({
     address,
   });
 
@@ -151,7 +151,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
         />
       )}
       <HStack
-        hidden={!!winner}
+        hidden={hasWinner}
         width="100%"
         gap={4}
         align="flex-start"
@@ -197,7 +197,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
           Submit
         </Button>
       </HStack>
-      {winner && (
+      {hasWinner && (
         <Text
           fontSize={{ base: "16px", md: "18px", lg: "20px" }}
           fontWeight="bold"
@@ -205,7 +205,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
         >
           {winner === accountAddress
             ? "You won this riddle!"
-            : `This riddle is over. The winner is ${formatAddress(winner)}.`}
+            : `This riddle is over. The winner is ${formatAddress(winner!)}.`}
         </Text>
       )}
       <HStack

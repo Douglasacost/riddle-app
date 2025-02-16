@@ -1,20 +1,23 @@
 import { useCallback } from "react";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { BaseContractConfig } from "./types";
 import OnChainRiddle from "@repo/contracts/abi";
 import { Address, keccak256, toBytes } from "viem";
+import { OnChainRiddle$Type } from "./OnChainRiddle";
+import { useCustomContractWrite } from './useCustomWrite';
 
-const RIDDLE_ABI = OnChainRiddle.abi;
+const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
+
 export interface UseRiddleAsBotConfig extends BaseContractConfig {}
 
 export function useRiddleAsBot({
   address,
 }: UseRiddleAsBotConfig) {
   const {
-    data: hash,
-    error: submitError,
-    writeContract: submitAnswer,
-  } = useWriteContract();
+    hash,
+    write,
+    error,
+  } = useCustomContractWrite();
 
   const {
     isLoading: isConfirming,
@@ -31,26 +34,27 @@ export function useRiddleAsBot({
     async (riddle: string, answer: string) => {
       try {
         const hashedAnswer = keccak256(toBytes(answer));
-        await submitAnswer({
+        write({
           address,
           abi: RIDDLE_ABI,
           functionName: "setRiddle",
           args: [riddle, hashedAnswer],
-        });
+          type: "eip712",
+        } as any);
         return true;
       } catch (error) {
         console.error("Error submitting answer:", error);
         return false;
       }
     },
-    [address, submitAnswer]
+    [address, write]
   );
 
   return {
     // Write states
     isConfirming,
     isConfirmed,
-    submitError,
+    submitError: error,
     transactionDetails,
 
     // Actions

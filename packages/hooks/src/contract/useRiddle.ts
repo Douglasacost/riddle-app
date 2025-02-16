@@ -1,15 +1,16 @@
 import { useCallback, useMemo, useState } from "react";
 import {
   useReadContract,
-  useWriteContract,
   useWaitForTransactionReceipt,
   useWatchContractEvent,
 } from "wagmi";
 import { BaseContractConfig } from "./types";
-import { Abi, Address } from "viem";
+import { Address } from "viem";
 import OnChainRiddle from "@repo/contracts/abi";
+import { OnChainRiddle$Type } from "./OnChainRiddle";
+import { useCustomContractWrite } from "./useCustomWrite";
 
-const RIDDLE_ABI = OnChainRiddle.abi as Abi;
+const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
 
 export interface UseRiddleConfig extends BaseContractConfig {}
 
@@ -51,19 +52,11 @@ export function useRiddle({ address }: UseRiddleConfig) {
   });
 
   const {
-    data: hash,
-    error: submitError,
-    writeContract: submitAnswer,
-    isPending: isSubmitting,
-    reset: resetSubmit,
-  } = useWriteContract({
-    mutation: {
-      onError(error) {
-        console.error("Error submitting answer:", error);
-        resetSubmit();
-      },
-    },
-  });
+    hash,
+    write,
+    isPending,
+    error,
+  } = useCustomContractWrite();
 
   const {
     isSuccess: isConfirmed,
@@ -80,19 +73,20 @@ export function useRiddle({ address }: UseRiddleConfig) {
       if (!answer.trim() || !address) return false;
 
       try {
-        await submitAnswer({
+        await write({
           address,
           abi: RIDDLE_ABI,
           functionName: "submitAnswer",
           args: [answer.toLowerCase().trim()],
-        });
+          type: "eip712",
+        } as any);
         return true;
       } catch (error) {
         console.error("Error submitting answer:", error);
         return false;
       }
     },
-    [address, submitAnswer]
+    [address, write]
   );
 
   return {
@@ -105,8 +99,8 @@ export function useRiddle({ address }: UseRiddleConfig) {
     // Write states
     isConfirmed,
     isConfirming,
-    isSubmitting,
-    submitError,
+    isSubmitting: isPending,
+    submitError: error,
     transactionDetails,
 
     // Attempt tracking
