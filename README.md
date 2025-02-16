@@ -16,6 +16,9 @@ A decentralized riddle game built on ZkSync Era.
 ## Development
 
 ```bash
+npm run compile
+
+# Run the DApp
 npm run dev
 ```
 
