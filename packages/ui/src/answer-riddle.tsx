@@ -6,7 +6,6 @@ import {
   Fieldset,
   Badge,
   Text,
-  Skeleton,
 } from "@chakra-ui/react";
 import { useRiddle, useRiddleWinner } from "@repo/hooks";
 import { useEffect, useState } from "react";
@@ -59,6 +58,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
     isConfirming,
     isConfirmed,
     transactionDetails,
+    asserted,
   } = useRiddle({
     address,
   });
@@ -71,7 +71,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
     if (isConfirmed) {
       toaster.update(answerToastId, {
         title: "Answer submitted",
-        type: "success",
+        type: "info",
         duration: 3000,
       });
       lookupWinner();
@@ -125,6 +125,20 @@ export function AnswerRiddle({ address }: { address: Address }) {
       await submitAnswer(answer.toLowerCase().trim());
     }
   };
+
+  useEffect(() => {
+    if (asserted === true) {
+      toaster.create({
+        title: "Correct answer",
+        type: "success",
+      });
+    } else if (asserted === false) {
+      toaster.create({
+        title: "Incorrect answer",
+        type: "error",
+      });
+    }
+  }, [asserted]);
 
   const formatAddress = (address: Address) => {
     return address.slice(0, 6) + "..." + address.slice(-4);

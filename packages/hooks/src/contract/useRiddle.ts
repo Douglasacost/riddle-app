@@ -3,9 +3,10 @@ import {
   useReadContract,
   useWaitForTransactionReceipt,
   useWatchContractEvent,
+  useWatchPendingTransactions,
 } from "wagmi";
 import { BaseContractConfig } from "./types";
-import { Address } from "viem";
+import { Address, decodeEventLog } from "viem";
 import OnChainRiddle from "@repo/contracts/abi";
 import { OnChainRiddle$Type } from "./OnChainRiddle";
 import { useCustomContractWrite } from "./useCustomWrite";
@@ -33,6 +34,8 @@ export function useRiddle({ address }: UseRiddleConfig) {
     }>
   >([]);
 
+  const [asserted, setAsserted] = useState<boolean>();
+
   const isActive = useMemo(() => {
     return riddle !== undefined && riddle.length > 0;
   }, [riddle]);
@@ -56,6 +59,7 @@ export function useRiddle({ address }: UseRiddleConfig) {
   const {
     isSuccess: isConfirmed,
     isLoading: isConfirming,
+    data: receipt,
     ...transactionDetails
   } = useWaitForTransactionReceipt({
     hash,
@@ -68,13 +72,32 @@ export function useRiddle({ address }: UseRiddleConfig) {
       if (!answer.trim() || !address) return false;
 
       try {
-        await write({
+        setAsserted(undefined);
+        const receipt = await write({
           address,
           abi: RIDDLE_ABI,
           functionName: "submitAnswer",
           args: [answer.toLowerCase().trim()],
         });
-        return true;
+
+        receipt.logs
+          .filter((log) => {
+            return log.address.toLowerCase() === address.toLowerCase();
+          })
+          .forEach((log) => {
+            const topics = log.topics;
+            const decoded = decodeEventLog({
+              abi: RIDDLE_ABI,
+              data: log.data,
+              topics,
+            });
+
+            if (decoded.eventName === "AnswerAttempt") {
+              setAsserted(decoded.args.correct);
+            }
+          });
+
+        return receipt;
       } catch (error) {
         console.error("Error submitting answer:", error);
         return false;
@@ -99,6 +122,7 @@ export function useRiddle({ address }: UseRiddleConfig) {
 
     // Attempt tracking
     attempts,
+    asserted,
 
     // Actions
     submit,

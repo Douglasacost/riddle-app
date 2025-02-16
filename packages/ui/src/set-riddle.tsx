@@ -29,7 +29,7 @@ export function SetRiddle({ address }: { address: Address }) {
     if (isConfirmed) {
       toaster.update(setRiddleToastId, {
         title: "Riddle set",
-        type: "success",
+        type: "info",
         duration: 3000,
       });
     }

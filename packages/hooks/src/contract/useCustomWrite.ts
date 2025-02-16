@@ -3,6 +3,7 @@ import { zksyncSepoliaTestnet } from "viem/chains";
 import { useAccount, useWalletClient } from "wagmi";
 import { eip712WalletActions } from "viem/zksync";
 import { publicClient } from "@repo/config";
+
 export function useCustomContractWrite() {
   const account = useAccount();
   const walletClient = useWalletClient({
