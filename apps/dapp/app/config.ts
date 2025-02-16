@@ -1,9 +1,9 @@
 import { http, createConfig } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { zksyncSepoliaTestnet } from "wagmi/chains";
 import { injected, metaMask, safe, walletConnect } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [sepolia],
+  chains: [zksyncSepoliaTestnet],
   connectors: [
     injected(),
     walletConnect({
@@ -13,6 +13,6 @@ export const config = createConfig({
     safe(),
   ],
   transports: {
-    [sepolia.id]: http(),
+    [zksyncSepoliaTestnet.id]: http(),
   },
 });

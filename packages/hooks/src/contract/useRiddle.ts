@@ -6,11 +6,10 @@ import {
   useWatchContractEvent,
 } from "wagmi";
 import { BaseContractConfig } from "./types";
-import { Address } from "viem";
+import { Abi, Address } from "viem";
 import OnChainRiddle from "@repo/contracts/abi";
-import { OnChainRiddle$Type } from "@repo/contracts/types";
 
-const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
+const RIDDLE_ABI = OnChainRiddle.abi as Abi;
 
 export interface UseRiddleConfig extends BaseContractConfig {}
 

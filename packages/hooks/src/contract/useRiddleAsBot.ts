@@ -2,10 +2,9 @@ import { useCallback } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { BaseContractConfig } from "./types";
 import OnChainRiddle from "@repo/contracts/abi";
-import { OnChainRiddle$Type } from "@repo/contracts/types";
 import { Address, keccak256, toBytes } from "viem";
 
-const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
+const RIDDLE_ABI = OnChainRiddle.abi;
 export interface UseRiddleAsBotConfig extends BaseContractConfig {}
 
 export function useRiddleAsBot({

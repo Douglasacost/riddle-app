@@ -1,17 +1,39 @@
 import type { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox-viem";
-import "dotenv/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "@matterlabs/hardhat-zksync";
+
+import dotenv from "dotenv";
+dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.28",
+  defaultNetwork: "ZKsyncEraSepolia",
   networks: {
-    sepolia: {
-      url: process.env.SEPOLIA_URL,
-      accounts: [process.env.PRIVATE_KEY as string],
+    ZKsyncEraSepolia: {
+      url: "https://sepolia.era.zksync.dev",
+      ethNetwork: "sepolia",
+      zksync: true,
+      verifyURL:
+        "https://explorer.sepolia.era.zksync.dev/contract_verification",
+      accounts: process.env.WALLET_PRIVATE_KEY
+        ? [process.env.WALLET_PRIVATE_KEY]
+        : [],
+    },
+    hardhat: {
+      zksync: true,
     },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY as string,
+  },
+  zksolc: {
+    version: "latest",
+    settings: {
+      // find all available options in the official documentation
+      // https://docs.zksync.io/build/tooling/hardhat/hardhat-zksync-solc#configuration
+    },
+  },
+  solidity: {
+    version: "0.8.24",
   },
 };
 
