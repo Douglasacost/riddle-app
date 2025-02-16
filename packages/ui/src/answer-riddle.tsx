@@ -58,65 +58,47 @@ export function AnswerRiddle({ address }: { address: Address }) {
 
   const {
     submit: submitAnswer,
-    isSubmitPending,
-    isSuccess,
     submitError,
-    isSubmitSuccess,
-    transactionDetails,
     attempts,
+    isConfirming,
+    isConfirmed,
+    transactionDetails,
   } = useRiddleContract({
     address,
   });
 
-  const { winner } = useRiddleWinner({
+  const { winner, lookupWinner } = useRiddleWinner({
     address,
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isConfirmed) {
       toaster.update(answerToastId, {
         title: "Answer submitted",
         type: "success",
         duration: 3000,
       });
-      setAnswer("");
+      lookupWinner();
     }
 
     if (transactionDetails?.error) {
-      const error = transactionDetails?.error;
       const message =
-        "shortMessage" in error
-          ? error.shortMessage
-          : "details" in error
-            ? error.details
-            : error.message;
+        "shortMessage" in transactionDetails.error
+          ? transactionDetails.error.shortMessage
+          : "details" in transactionDetails.error
+            ? transactionDetails.error.details
+            : transactionDetails.error.message;
 
       toaster.update(answerToastId, {
-        title: "Something went wrong",
+        title: "Error submitting answer",
         description: message as string,
         type: "error",
-        duration: 5000,
+        duration: 3000,
       });
     }
-  }, [isSuccess, transactionDetails]);
+  }, [isConfirmed, transactionDetails, lookupWinner]);
 
   useEffect(() => {
-    if (isSubmitPending) {
-      toaster.create({
-        id: answerToastId,
-        title: "Submitting answer...",
-        type: "loading",
-        duration: Infinity,
-      });
-    }
-    if (isSubmitSuccess) {
-      toaster.update(answerToastId, {
-        title: "Confirming...",
-        type: "loading",
-        duration: Infinity,
-      });
-    }
-
     if (submitError) {
       const message =
         "shortMessage" in submitError
@@ -132,11 +114,18 @@ export function AnswerRiddle({ address }: { address: Address }) {
         duration: 3000,
       });
     }
-  }, [isSubmitSuccess, submitError, isSubmitPending]);
+  }, [submitError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isError && answer.trim()) {
+      toaster.create({
+        id: answerToastId,
+        title: "Submitting answer...",
+        type: "loading",
+        duration: Infinity,
+      });
+
       await submitAnswer(answer.toLowerCase().trim());
     }
   };
@@ -174,7 +163,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
           boxShadow: "0px 0px 19px 0px rgba(255,255,255,1)",
         }}
       >
-        <Fieldset.Root invalid={isError} disabled={isSubmitPending}>
+        <Fieldset.Root invalid={isError} disabled={isConfirming}>
           <Textarea
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
@@ -202,7 +191,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
           borderRadius="lg"
           boxShadow="inset 0px 0px 19px 0px rgba(0,0,0,0.30);"
           colorScheme="blue"
-          loading={isSubmitPending}
+          loading={isConfirming}
           disabled={isError || !answer.trim()}
         >
           Submit
@@ -219,7 +208,13 @@ export function AnswerRiddle({ address }: { address: Address }) {
             : `This riddle is over. The winner is ${formatAddress(winner)}.`}
         </Text>
       )}
-      <HStack mt={4} gap={4} align="center" justify="center">
+      <HStack
+        hidden={attempts.length === 0}
+        mt={4}
+        gap={4}
+        align="center"
+        justify="center"
+      >
         <Text>Previous attempts: </Text>
         {attempts.map((attempt, index) => (
           <Badge key={index}>{formatAddress(attempt.user!)}</Badge>

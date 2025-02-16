@@ -47,22 +47,30 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
   const {
     data: hash,
     error: submitError,
-    isPending: isSubmitPending,
-    isSuccess: isSubmitSuccess,
     writeContract: submitAnswer,
+    reset: resetSubmit,
   } = useWriteContract({
     mutation: {
       onError(error) {
         console.error("Error submitting answer:", error);
+        resetSubmit();
+      },
+      onSuccess() {
+        console.info("Success submitting answer");
+        resetSubmit();
       },
     },
   });
 
   const {
     isSuccess: isConfirmed,
+    isLoading: isConfirming,
     ...transactionDetails
   } = useWaitForTransactionReceipt({
     hash,
+    confirmations: 0,
+    timeout: 10000,
+    pollingInterval: 1000,
   });
 
   const submit = useCallback(
@@ -86,15 +94,14 @@ export function useRiddleContract({ address }: UseRiddleContractConfig) {
   return {
     // Read states
     riddle,
-    isLoading: isRiddlePending,
-    error: riddleError,
+    isRiddlePending,
+    riddleError,
 
     // Write states
-    isSuccess: isConfirmed,
+    isConfirmed,
+    isConfirming,
     submitError,
     transactionDetails,
-    isSubmitPending,
-    isSubmitSuccess,
     attempts,
 
     // Actions

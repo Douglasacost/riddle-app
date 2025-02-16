@@ -3,20 +3,20 @@ import { useRiddleContract } from "@repo/hooks";
 import { Address } from "viem";
 
 export function CurrentRiddle({ address }: { address: Address }) {
-  const { isLoading, error, riddle } = useRiddleContract({
+  const { isRiddlePending, riddleError, riddle } = useRiddleContract({
     address,
   });
 
-  if (error) {
+  if (riddleError) {
     return (
       <Box p={4} mb={8} bg="red.50" borderRadius="md">
-        <Text color="red.500">Error loading riddle: {error.message}</Text>
+        <Text color="red.500">Error loading riddle: {riddleError.message}</Text>
       </Box>
     );
   }
 
   return (
-    <Skeleton loading={isLoading} minH="20px" mb={8}>
+    <Skeleton loading={isRiddlePending} minH="20px" mb={8}>
       <Text fontSize="4xl" textAlign="center" fontWeight="bold">
         {(riddle as string) || "No active riddle"}
       </Text>

@@ -17,17 +17,16 @@ const setRiddleToastId = "set-riddle-toast";
 export function SetRiddle({ address }: { address: Address }) {
   const {
     submit: submitRiddle,
-    isSubmitting,
-    isSuccess,
     submitError,
-    isSubmitSuccess,
+    isConfirmed,
+    isConfirming,
     transactionDetails,
   } = useRiddleContractAsBot({
     address,
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isConfirmed) {
       toaster.update(setRiddleToastId, {
         title: "Riddle set",
         type: "success",
@@ -36,40 +35,23 @@ export function SetRiddle({ address }: { address: Address }) {
     }
 
     if (transactionDetails?.error) {
-      const error = transactionDetails?.error;
       const message =
-        "shortMessage" in error
-          ? error.shortMessage
-          : "details" in error
-            ? error.details
-            : error.message;
+        "shortMessage" in transactionDetails.error
+          ? transactionDetails.error.shortMessage
+          : "details" in transactionDetails.error
+            ? transactionDetails.error.details
+            : transactionDetails.error.message;
 
       toaster.update(setRiddleToastId, {
-        title: "Something went wrong",
+        title: "Error setting riddle",
         description: message as string,
         type: "error",
         duration: 3000,
       });
     }
-  }, [isSuccess, transactionDetails]);
+  }, [isConfirmed, transactionDetails]);
 
   useEffect(() => {
-    if (isSubmitting) {
-      toaster.create({
-        id: setRiddleToastId,
-        title: "Submitting riddle...",
-        type: "loading",
-        duration: Infinity,
-      });
-    }
-    if (isSubmitSuccess) {
-      toaster.update(setRiddleToastId, {
-        title: "Confirming...",
-        type: "loading",
-        duration: Infinity,
-      });
-    }
-
     if (submitError) {
       const message =
         "shortMessage" in submitError
@@ -85,7 +67,7 @@ export function SetRiddle({ address }: { address: Address }) {
         duration: 3000,
       });
     }
-  }, [isSubmitSuccess, submitError, isSubmitting]);
+  }, [submitError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,12 +77,20 @@ export function SetRiddle({ address }: { address: Address }) {
     if (!riddle || !answer) {
       return;
     }
+
+    toaster.create({
+      id: setRiddleToastId,
+      title: "Setting riddle...",
+      type: "loading",
+      duration: Infinity,
+    });
+
     await submitRiddle(riddle.trim(), answer.trim().toLowerCase());
   };
 
   return (
     <VStack as="form" onSubmit={handleSubmit}>
-      <Fieldset.Root size="lg" maxW="md">
+      <Fieldset.Root size="lg" maxW="md" disabled={isConfirmed}>
         <Stack>
           <Fieldset.Legend>Set Riddle</Fieldset.Legend>
           <Fieldset.HelperText>
@@ -118,7 +108,7 @@ export function SetRiddle({ address }: { address: Address }) {
           </Field>
         </Fieldset.Content>
 
-        <Button type="submit" alignSelf="flex-start" loading={isSubmitting}>
+        <Button type="submit" alignSelf="flex-start" loading={isConfirming}>
           Submit
         </Button>
       </Fieldset.Root>

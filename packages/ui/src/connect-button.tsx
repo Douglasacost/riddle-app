@@ -8,7 +8,11 @@ import { MenuRoot, MenuTrigger, MenuContent, MenuItem } from "./menu";
 
 export const LoadingConnectButton = () => {
   return (
-    <Button loading={true}>
+    <Button
+      boxShadow="inset 0px 0px 19px 0px rgba(0,0,0,0.30);"
+      borderRadius="lg"
+      loading={true}
+    >
       Loading...
     </Button>
   );
@@ -25,7 +29,7 @@ export function ConnectButton({
   onDisconnect,
   ...props
 }: ConnectButtonProps & ButtonProps) {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, connector } = useAccount();
   const { data: ensName } = useEnsName({
     address,
   });
@@ -46,6 +50,7 @@ export function ConnectButton({
       },
     },
   });
+
   const { disconnect } = useDisconnect({
     mutation: {
       onSuccess() {
@@ -54,6 +59,12 @@ export function ConnectButton({
       },
     },
   });
+
+  const connectorsToUse = React.useMemo(() => {
+    return connectors.filter((connector) =>
+      ["MetaMask", "WalletConnect", "Talisman"].includes(connector.name)
+    );
+  }, [connectors]);
 
   const handleClick = (fn: () => void) => {
     setLoading(true);
@@ -74,7 +85,16 @@ export function ConnectButton({
           </Button>
         </MenuTrigger>
         <MenuContent>
-          <MenuItem value="Disconnect" onClick={() => handleClick(disconnect)}>
+          <MenuItem
+            value="Disconnect"
+            onClick={() =>
+              handleClick(() =>
+                disconnect({
+                  connector,
+                })
+              )
+            }
+          >
             Disconnect
           </MenuItem>
         </MenuContent>
@@ -95,7 +115,7 @@ export function ConnectButton({
         </Button>
       </MenuTrigger>
       <MenuContent>
-        {connectors.map((connector) => (
+        {connectorsToUse.map((connector) => (
           <MenuItem
             key={connector.uid}
             value={connector.name}

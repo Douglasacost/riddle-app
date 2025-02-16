@@ -1,9 +1,5 @@
 import { useCallback } from "react";
-import {
-  useReadContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { BaseContractConfig } from "./types";
 import OnChainRiddle from "@repo/contracts/abi";
 import { OnChainRiddle$Type } from "@repo/contracts/types";
@@ -12,34 +8,14 @@ import { Address, keccak256, toBytes } from "viem";
 const RIDDLE_ABI = OnChainRiddle.abi as OnChainRiddle$Type["abi"];
 export interface UseRiddleContractAsBotConfig extends BaseContractConfig {}
 
-export function useRiddleContractAsBot({ address }: UseRiddleContractAsBotConfig) {
-  const {
-    data: hasAnswered,
-    error: hasAnsweredError,
-    isPending: isHasAnsweredPending,
-    refetch: refetchHasAnswered,
-  } = useReadContract({
-    address,
-    abi: RIDDLE_ABI,
-    functionName: "winner",
-  });
-
+export function useRiddleContractAsBot({
+  address,
+}: UseRiddleContractAsBotConfig) {
   const {
     data: hash,
     error: submitError,
-    isPending: isSubmitPending,
-    isSuccess: isSubmitSuccess,
     writeContract: submitAnswer,
-  } = useWriteContract({
-    mutation: {
-      onSuccess() {
-        refetchHasAnswered();
-      },
-      onError(error) {
-        console.error("Error submitting answer:", error);
-      },
-    },
-  });
+  } = useWriteContract();
 
   const {
     isLoading: isConfirming,
@@ -47,6 +23,9 @@ export function useRiddleContractAsBot({ address }: UseRiddleContractAsBotConfig
     ...transactionDetails
   } = useWaitForTransactionReceipt({
     hash,
+    confirmations: 1,
+    timeout: 10000,
+    pollingInterval: 1000,
   });
 
   const submit = useCallback(
@@ -68,25 +47,14 @@ export function useRiddleContractAsBot({ address }: UseRiddleContractAsBotConfig
     [address, submitAnswer]
   );
 
-  const refresh = useCallback(() => {
-    refetchHasAnswered();
-  }, [refetchHasAnswered]);
-
   return {
-    // Read states
-    hasAnswered,
-    isLoadingHasAnswered: isHasAnsweredPending,
-    errorHasAnswered: hasAnsweredError,
-
     // Write states
-    isSubmitting: isSubmitPending || isConfirming,
-    isSuccess: isConfirmed,
+    isConfirming,
+    isConfirmed,
     submitError,
     transactionDetails,
-    isSubmitSuccess,
 
     // Actions
     submit,
-    refresh
   };
 }
