@@ -64,7 +64,12 @@ export function ConnectButton({
     return (
       <MenuRoot positioning={{ placement: "bottom-end" }}>
         <MenuTrigger asChild>
-          <Button loading={loading} {...props}>
+          <Button
+            boxShadow="inset 0px 0px 19px 0px rgba(0,0,0,0.30);"
+            borderRadius="lg"
+            loading={loading}
+            {...props}
+          >
             {buttonText ? buttonText : "Connect"}
           </Button>
         </MenuTrigger>
@@ -80,7 +85,12 @@ export function ConnectButton({
   return (
     <MenuRoot positioning={{ placement: "bottom-end" }}>
       <MenuTrigger asChild>
-        <Button loading={loading} {...props}>
+        <Button
+          boxShadow="inset 0px 0px 19px 0px rgba(0,0,0,0.30);"
+          borderRadius="lg"
+          loading={loading}
+          {...props}
+        >
           Connect
         </Button>
       </MenuTrigger>

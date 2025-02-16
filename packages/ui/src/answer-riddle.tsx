@@ -18,7 +18,7 @@ const answerToastId = "answer-riddle-toast";
 
 export const LoadingAnswerRiddle = () => {
   return (
-    <Box>
+    <Box w={{ base: "100%", md: "90%", lg: "80%" }}>
       <HStack gap={4} align="flex-start">
         <Fieldset.Root>
           <Skeleton height="40px" width="400px" />
@@ -59,16 +59,6 @@ export function AnswerRiddle({ address }: { address: Address }) {
       });
     }
 
-    if (transactionDetails?.status === "error") {
-      const reason = transactionDetails.error?.message;
-      toaster.update(answerToastId, {
-        title: "Answer submission reverted",
-        description: reason,
-        type: "error",
-        duration: 3000,
-      });
-    }
-
     if (transactionDetails?.error) {
       const error = transactionDetails?.error;
       const message =
@@ -82,7 +72,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
         title: "Something went wrong",
         description: message as string,
         type: "error",
-        duration: 3000,
+        duration: 5000,
       });
     }
   }, [isSuccess, transactionDetails]);
@@ -135,15 +125,39 @@ export function AnswerRiddle({ address }: { address: Address }) {
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit}>
-      <HStack gap={4} align="flex-start">
+    <Box
+      as="form"
+      w={{ base: "100%", md: "90%", lg: "80%" }}
+      onSubmit={handleSubmit}
+    >
+      <HStack
+        width="100%"
+        gap={4}
+        align="flex-start"
+        boxShadow="0px 0px 19px 0px rgba(255,255,255,0.30)"
+        transition="all 0.3s ease"
+        overflow="hidden"
+        borderRadius="lg"
+        _focusWithin={{
+          boxShadow: "0px 0px 19px 0px rgba(255,255,255,1)",
+        }}
+      >
         <Fieldset.Root invalid={isError} disabled={isSubmitting}>
           <Textarea
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder="Enter your answer..."
-            maxW="400px"
-            resize="vertical"
+            resize="none"
+            fontSize="16px"
+            lineHeight="20px"
+            border="none"
+            _focus={{
+              border: "none",
+            }}
+            outline="none"
+            overflow="hidden"
+            rows={2}
+            height="60px"
           />
           <Fieldset.ErrorText>
             Answer must be less than 100 characters
@@ -152,6 +166,9 @@ export function AnswerRiddle({ address }: { address: Address }) {
 
         <Button
           type="submit"
+          h="60px"
+          borderRadius="lg"
+          boxShadow="inset 0px 0px 19px 0px rgba(0,0,0,0.30);"
           colorScheme="blue"
           loading={isSubmitting}
           disabled={isError || !answer.trim()}

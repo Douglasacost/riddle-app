@@ -9,7 +9,7 @@ export function CurrentRiddle({ address }: { address: Address }) {
 
   if (error) {
     return (
-      <Box p={4} bg="red.50" borderRadius="md">
+      <Box p={4} mb={8} bg="red.50" borderRadius="md">
         <Text color="red.500">Error loading riddle: {error.message}</Text>
       </Box>
     );
@@ -17,7 +17,7 @@ export function CurrentRiddle({ address }: { address: Address }) {
 
   return (
     <Skeleton loading={isLoading} minH="20px">
-      <Text fontSize="4xl" fontWeight="bold">
+      <Text fontSize="4xl" textAlign="center" mb={8} fontWeight="bold">
         {(riddle as string) || "No active riddle"}
       </Text>
     </Skeleton>

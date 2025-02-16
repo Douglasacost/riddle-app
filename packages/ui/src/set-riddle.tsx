@@ -35,16 +35,6 @@ export function SetRiddle({ address }: { address: Address }) {
       });
     }
 
-    if (transactionDetails?.status === "error") {
-      const reason = transactionDetails.error?.message;
-      toaster.update(setRiddleToastId, {
-        title: "Riddle set reverted",
-        description: reason,
-        type: "error",
-        duration: 3000,
-      });
-    }
-
     if (transactionDetails?.error) {
       const error = transactionDetails?.error;
       const message =
@@ -81,7 +71,6 @@ export function SetRiddle({ address }: { address: Address }) {
     }
 
     if (submitError) {
-      console.log("submitError", submitError);
       const message =
         "shortMessage" in submitError
           ? submitError.shortMessage
