@@ -133,6 +133,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
         type: "success",
       });
     } else if (asserted === false) {
+      setAnswer("");
       toaster.create({
         title: "Incorrect answer",
         type: "error",
@@ -158,7 +159,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
       w={{ base: "100%", md: "90%", lg: "80%" }}
       onSubmit={handleSubmit}
     >
-      {winner === accountAddress && (
+      {(winner === accountAddress || asserted) && (
         <Confetti
           width={window.innerWidth}
           height={window.innerHeight}

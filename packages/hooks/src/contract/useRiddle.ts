@@ -54,6 +54,18 @@ export function useRiddle({ address }: UseRiddleConfig) {
     },
   });
 
+  useWatchContractEvent({
+    address,
+    abi: RIDDLE_ABI,
+    eventName: "RiddleSet",
+    pollingInterval: 5000,
+    onLogs: (logs) => {
+      setAttempts([]);
+      setAsserted(undefined);
+      refetchRiddle();
+    },
+  });
+
   const { hash, write, isPending, error } = useCustomContractWrite();
 
   const {
@@ -94,6 +106,7 @@ export function useRiddle({ address }: UseRiddleConfig) {
 
             if (decoded.eventName === "AnswerAttempt") {
               setAsserted(decoded.args.correct);
+              setAttempts([]);
             }
           });
 
