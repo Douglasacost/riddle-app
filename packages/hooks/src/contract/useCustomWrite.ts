@@ -25,6 +25,7 @@ export function useCustomContractWrite() {
     }) => {
       try {
         setIsPending(true);
+        setHash(undefined);
         setError(undefined);
 
         const client = await walletClient.data?.extend(eip712WalletActions());
@@ -37,6 +38,7 @@ export function useCustomContractWrite() {
         } as any);
 
         if (!tx) {
+          debugger
           throw new Error("Failed to write to contract");
         }
 

@@ -55,6 +55,7 @@ export function ConnectButton({
     mutation: {
       onSuccess() {
         onDisconnect?.();
+        connector?.disconnect();
         setLoading(false);
       },
     },
@@ -81,7 +82,7 @@ export function ConnectButton({
             loading={loading}
             {...props}
           >
-            {buttonText ? buttonText : "Connect"}
+            {buttonText}
           </Button>
         </MenuTrigger>
         <MenuContent>

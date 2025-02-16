@@ -21,7 +21,6 @@ const answerToastId = "answer-riddle-toast";
 export const LoadingAnswerRiddle = () => {
   return (
     <>
-      <Skeleton height="54px" width="400px" mb={8} />
       <Box w={{ base: "100%", md: "90%", lg: "80%" }}>
         <HStack
           gap={4}
@@ -43,9 +42,6 @@ export const LoadingAnswerRiddle = () => {
             Submit
           </Button>
         </HStack>
-        <HStack mt={4} gap={4} align="center" justify="center">
-          <Skeleton height="22px" width="400px" />
-        </HStack>
       </Box>
     </>
   );
@@ -53,7 +49,7 @@ export const LoadingAnswerRiddle = () => {
 
 export function AnswerRiddle({ address }: { address: Address }) {
   const [answer, setAnswer] = useState("");
-  const { address: accountAddress } = useAccount();
+  const { address: accountAddress, isConnected, isConnecting } = useAccount();
   const isError = answer.length > MAX_ANSWER_LENGTH;
 
   const {
@@ -67,7 +63,7 @@ export function AnswerRiddle({ address }: { address: Address }) {
     address,
   });
 
-  const { winner, hasWinner, lookupWinner } = useRiddleWinner({
+  const { winner, hasWinner, lookupWinner, isLoading } = useRiddleWinner({
     address,
   });
 
@@ -133,6 +129,14 @@ export function AnswerRiddle({ address }: { address: Address }) {
   const formatAddress = (address: Address) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
   };
+
+  if (isLoading || isConnecting) {
+    return <LoadingAnswerRiddle />;
+  }
+
+  if (!isConnected) {
+    return <Text>Connect to answer the riddle</Text>;
+  }
 
   return (
     <Box

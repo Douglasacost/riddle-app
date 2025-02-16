@@ -11,7 +11,7 @@ export function Provider(props: ColorModeProviderProps) {
   return (
     <ChakraProvider value={defaultSystem}>
       <Toaster />
-      <ColorModeProvider {...props} />
+      <ColorModeProvider forcedTheme="dark" {...props} />
     </ChakraProvider>
   )
 }

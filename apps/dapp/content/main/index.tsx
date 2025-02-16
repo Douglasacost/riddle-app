@@ -27,28 +27,19 @@ export default function Main() {
     }
   }, [isConnected, address, checkBot, isLoading]);
 
-  if (isLoading) {
-    return (
-      <VStack flex={1} align="center" justify="center" p={4}>
-        <LoadingAnswerRiddle />
-      </VStack>
-    );
-  }
-
   if (isBot) {
     return (
-      <VStack flex={1} align="center" justify="center" p={4}>
+      <VStack height="80%" align="center" justify="center" p={4}>
         <SetRiddle address={riddleContractAddress} />
       </VStack>
     );
   }
 
   return (
-    <VStack flex={1} align="center" justify="center" p={4}>
+    <VStack height="80%" align="center" justify="center" p={4}>
       <CurrentRiddle address={riddleContractAddress} />
 
-      {isConnected && <AnswerRiddle address={riddleContractAddress} />}
-      {!isConnected && <Text>Connect to answer the riddle</Text>}
+      <AnswerRiddle address={riddleContractAddress} />
     </VStack>
   );
 }

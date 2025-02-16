@@ -47,16 +47,11 @@ export function useRiddle({ address }: UseRiddleConfig) {
         user: log.args.user as Address,
         correct: log.args.correct as boolean,
       }));
-      setAttempts((prev) => [...newAttempts, ...prev].slice(0, 10)); // Keep last 10 attempts
+      setAttempts((prev) => [...newAttempts, ...prev].slice(0, 3)); // Keep last 10 attempts
     },
   });
 
-  const {
-    hash,
-    write,
-    isPending,
-    error,
-  } = useCustomContractWrite();
+  const { hash, write, isPending, error } = useCustomContractWrite();
 
   const {
     isSuccess: isConfirmed,
@@ -78,8 +73,7 @@ export function useRiddle({ address }: UseRiddleConfig) {
           abi: RIDDLE_ABI,
           functionName: "submitAnswer",
           args: [answer.toLowerCase().trim()],
-          type: "eip712",
-        } as any);
+        });
         return true;
       } catch (error) {
         console.error("Error submitting answer:", error);
