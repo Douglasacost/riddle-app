@@ -61,7 +61,7 @@ const getWallet = () => {
     throw new Error("PRIVATE_KEY is not set");
   }
 
-  const account = privateKeyToAccount(PRIVATE_KEY as `0x${string}`);
+  const account = privateKeyToAccount(`0x${PRIVATE_KEY}` as `0x${string}`);
 
   const client = createWalletClient({
     account,
@@ -72,32 +72,23 @@ const getWallet = () => {
   return { client, account };
 };
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    if (!request.headers.get("content-type")?.includes("application/json")) {
-      return NextResponse.json(
-        { error: "Content-Type must be application/json" },
-        { status: 415 }
-      );
-    }
+    const body = await req.json();
 
-    const body = await request.json();
+    console.log("Body:", body);
 
     if (!body.webhookId || body.webhookId !== "wh_hak0sy08vdy1wbl") {
-      return NextResponse.json(
-        { error: "Missing event field in request body" },
-        { status: 400 }
-      );
+      return new Response("Missing event field in request body", {
+        status: 400,
+      });
     }
 
     setRiddle();
 
-    return NextResponse.json({ status: "ok" });
+    return new Response("ok", { status: 200 });
   } catch (error) {
     console.error("Webhook error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return new Response("Internal server error", { status: 500 });
   }
 }
