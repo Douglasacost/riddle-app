@@ -16,7 +16,7 @@ export default function Header() {
   return (
     <HStack justify="space-between" align="center" p={4}>
       <Text fontSize="2xl" fontWeight="bold">
-        Riddle Dapp
+        🎭 Riddle Dapp
       </Text>
       <ConnectButton />
     </HStack>
