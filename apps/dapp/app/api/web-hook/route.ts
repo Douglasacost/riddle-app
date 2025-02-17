@@ -13,15 +13,15 @@ const RIDDLE_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_RIDDLE_CONTRACT_ADDRESS;
 const riddles = [
   {
     riddle: "What has to be broken before you can use it?",
-    answer: "An egg",
+    answer: "Eggs",
   },
   {
     riddle: "I'm tall when I'm young, and I'm short when I'm old. What am I?",
-    answer: "A candle",
+    answer: "candle",
   },
   {
     riddle: "What has hands but can't clap?",
-    answer: "A clock",
+    answer: "clock",
   },
   {
     riddle: "The more you take, the more you leave behind. What am I?",
@@ -29,7 +29,15 @@ const riddles = [
   },
   {
     riddle: "What has a face and two hands but no arms or legs?",
-    answer: "A clock",
+    answer: "clock",
+  },
+  {
+    riddle: "What is full of holes but still holds water?",
+    answer: "sponge",
+  },
+  {
+    riddle: "I add flavor to your dishes and keep your hash safe. What am I?",
+    answer: "Salt",
   },
 ];
 
