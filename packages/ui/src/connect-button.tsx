@@ -72,7 +72,7 @@ export function ConnectButton({
     if (error) {
       toaster.create({
         title: "Error",
-        description: error.message,
+        description: error.message.split(".")[0],
         type: "error",
       });
     }
